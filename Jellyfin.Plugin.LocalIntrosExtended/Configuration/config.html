@@ -97,7 +97,7 @@
                                 <input id="dateEnd" is="emby-input" type="date" />
                             </div>
                             <div class="inputContainer" style="flex: 1; min-width: 150px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="dateRepeatType">Repeat</label>
+                                <label class="inputLabel inputLabelUnfocused" for="dateRepeatType">Repeat <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Based on start/end dates)</span></label>
                                 <select id="dateRepeatType" is="emby-select">
                                     <option value="None">None</option>
                                     <option value="Weekly">Weekly</option>
@@ -262,6 +262,56 @@
                     return ApiClient.updatePluginConfiguration(plugin.guid, localIntroConfig);
                 };
 
+                var updateRepeatLabels = () => {
+                    var startVal = $('#dateStart').val();
+                    var endVal = $('#dateEnd').val();
+
+                    var weeklyLabel = "Weekly";
+                    var monthlyLabel = "Monthly";
+                    var yearlyLabel = "Yearly";
+
+                    if (startVal && endVal) {
+                        var start = new Date(startVal);
+                        var end = new Date(endVal);
+
+                        if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                            // Weekly: Get day names
+                            var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                            var startDay = days[start.getDay()];
+                            var endDay = days[end.getDay()];
+                            weeklyLabel = "Weekly (" + (startDay === endDay ? startDay : startDay + " to " + endDay) + ")";
+
+                            // Monthly: Get day numbers with ordinal suffixes
+                            var getOrdinal = (d) => {
+                                if (d > 3 && d < 21) return d + 'th';
+                                switch (d % 10) {
+                                    case 1:  return d + "st";
+                                    case 2:  return d + "nd";
+                                    case 3:  return d + "rd";
+                                    default: return d + "th";
+                                }
+                            };
+                            var startNum = start.getDate();
+                            var endNum = end.getDate();
+                            monthlyLabel = "Monthly (" + (startNum === endNum ? getOrdinal(startNum) : getOrdinal(startNum) + " to " + getOrdinal(endNum)) + ")";
+
+                            // Yearly: Format DD-MM
+                            var pad = n => n.toString().padStart(2, '0');
+                            var startFormatted = pad(start.getDate()) + '-' + pad(start.getMonth() + 1);
+                            var endFormatted = pad(end.getDate()) + '-' + pad(end.getMonth() + 1);
+                            
+                            var isWraparound = (start.getMonth() > end.getMonth()) || (start.getMonth() === end.getMonth() && start.getDate() > end.getDate());
+                            var wrapText = isWraparound ? " next year" : "";
+                            
+                            yearlyLabel = "Yearly (" + (startFormatted === endFormatted ? startFormatted : startFormatted + " to " + endFormatted + wrapText) + ")";
+                        }
+                    }
+
+                    $("#dateRepeatType option[value='Weekly']").text(weeklyLabel);
+                    $("#dateRepeatType option[value='Monthly']").text(monthlyLabel);
+                    $("#dateRepeatType option[value='Yearly']").text(yearlyLabel);
+                };
+
                 var resetRuleForm = () => {
                     currentEditIndex = -1;
                     $('#editorTitle').text("Add New Rule");
@@ -280,6 +330,7 @@
                     $('#dateStart').val('');
                     $('#dateEnd').val('');
                     $('#dateRepeatType').val("None");
+                    updateRepeatLabels();
                 };
 
                 var populateFormForEdit = (index) => {
@@ -305,6 +356,7 @@
                     $('#studioSelection').val((rule.Studios || []).join(', '));
                     $('#dateStart').val(cleanDate(rule.DateStart));
                     $('#dateEnd').val(cleanDate(rule.DateEnd));
+                    updateRepeatLabels();
                 };
 
                 var updateUi = () => {
@@ -498,6 +550,8 @@
 
                 $('#addRuleBtn').click(() => handleAddOrUpdate());
                 $('#updateRuleBtn').click(() => handleAddOrUpdate());
+
+                $('#dateStart, #dateEnd').on('change input', updateRepeatLabels);
 
                 document.querySelector('#configForm').addEventListener('submit', function (event) {
                     Dashboard.showLoadingMsg();
