@@ -29,6 +29,7 @@ public class IntroProvider : IIntroProvider
     {
         try
         {
+            logger.LogInformation($"[LocalIntrosExtended] GetIntros requested by User: '{user?.Username ?? "Unknown"}' for Media: '{item?.Name ?? "Unknown"}'");
             if (LocalIntrosPlugin.Instance.Configuration.Local != string.Empty)
             {
                 logger.LogTrace("Local Config Detected, retrieving local intros.");
@@ -170,7 +171,8 @@ public class IntroProvider : IIntroProvider
                     }
                     if (list.Any())
                     {
-                        logger.LogInformation($"Rule matched: '{rule.Name}'. Selected {list.Count} intros (Play All Mode).");
+                        var introNames = string.Join(", ", list.Select(x => x.ItemId.HasValue && libraryResults.ContainsKey(x.ItemId.Value) ? libraryResults[x.ItemId.Value].Name : "Unknown"));
+                        logger.LogInformation($"[LocalIntrosExtended] User: '{user?.Username ?? "Unknown"}', Media: '{item.Name}' -> Matched Rule: '{rule.Name}' -> Playing Intros (Play All): [{introNames}]");
                         return list;
                     }
                 }
@@ -181,7 +183,7 @@ public class IntroProvider : IIntroProvider
                     if (libraryResults.ContainsKey(selectedId))
                     {
                         var selectedItem = libraryResults[selectedId];
-                        logger.LogInformation($"Rule matched: '{rule.Name}'. Selected intro name: '{selectedItem.Name}' (Random Mode).");
+                        logger.LogInformation($"[LocalIntrosExtended] User: '{user?.Username ?? "Unknown"}', Media: '{item.Name}' -> Matched Rule: '{rule.Name}' -> Playing Intro (Random): '{selectedItem.Name}'");
                         return new[] { new IntroInfo { Path = selectedItem.Path, ItemId = selectedItem.Id } };
                     }
                 }

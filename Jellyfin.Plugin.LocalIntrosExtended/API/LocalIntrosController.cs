@@ -12,6 +12,7 @@ using Jellyfin.Plugin.LocalIntrosExtended.Configuration;
 using MediaBrowser.Common.Api;
 using MediaBrowser.Controller.Library;
 using Microsoft.Extensions.Logging;
+using Jellyfin.Database.Implementations.Entities;
 
 namespace Jellyfin.Plugin.LocalIntrosExtended;
 
@@ -199,7 +200,7 @@ public class LocalIntrosExtendedController : ControllerBase
         }).ToList();
 
         var validIds = LocalIntrosPlugin.Instance.Configuration.DetectedLocalVideos.Select(x => x.ItemId).ToHashSet();
-        var validUserIds = userManager.Users.Select(u => u.Id).ToHashSet();
+        var validUserIds = GetActiveUsers().Select(u => u.Id).ToHashSet();
         var validLibraryIds = LocalIntrosPlugin.LibraryManager.GetVirtualFolders().Select(f => Guid.Parse(f.ItemId)).ToHashSet();
 
         foreach (var rule in LocalIntrosPlugin.Instance.Configuration.Rules)
@@ -210,5 +211,37 @@ public class LocalIntrosExtendedController : ControllerBase
         }
 
         LocalIntrosPlugin.Instance.SaveConfiguration();
+    }
+
+    private IEnumerable<User> GetActiveUsers()
+    {
+        try
+        {
+            var getUsersMethod = userManager.GetType().GetMethod("GetUsers", Type.EmptyTypes);
+            if (getUsersMethod != null)
+            {
+                var result = getUsersMethod.Invoke(userManager, null);
+                if (result is IEnumerable<User> users)
+                {
+                    return users;
+                }
+            }
+
+            var usersProp = userManager.GetType().GetProperty("Users");
+            if (usersProp != null)
+            {
+                var result = usersProp.GetValue(userManager);
+                if (result is IEnumerable<User> users)
+                {
+                    return users;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving users via reflection");
+        }
+
+        return Enumerable.Empty<User>();
     }
 }
