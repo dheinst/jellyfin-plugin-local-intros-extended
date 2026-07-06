@@ -11,6 +11,10 @@
 
 **Local Intros Extended** is a fork of the official Jellyfin Intros plugin that enables pre-roll intro videos from local storage. It replaces the simple flat rules list with a improved rules engine that allows you to combine multiple conditions for advanced playback control.
 
+## Screenshot
+
+![Local Intros Extended Screenshot](screenshot.png)
+
 ### Key Features
 *   **Sequential Evaluation (First-Match-Wins)**: Rules are evaluated from top to bottom. The first matching rule is applied. You can easily order rules using the ▲ and ▼ buttons in the UI.
 *   **Frequency percentage chance**: Set a probability (0-100%) for each rule. If the rule matches, the specified chance determines whether it plays. If the roll fails, evaluation continues to the next rule.
