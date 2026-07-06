@@ -119,6 +119,10 @@ public class IntroProvider : IIntroProvider
             if (rule.Tags.Any() && !tags.Any(t => rule.Tags.Contains(t, StringComparer.OrdinalIgnoreCase)))
                 continue;
 
+            // Exclude tags
+            if (rule.ExcludeTags.Any() && tags.Any(t => rule.ExcludeTags.Contains(t, StringComparer.OrdinalIgnoreCase)))
+                continue;
+
             if (rule.Studios.Any() && !studios.Any(s => rule.Studios.Contains(s, StringComparer.OrdinalIgnoreCase)))
                 continue;
 
@@ -134,22 +138,52 @@ public class IntroProvider : IIntroProvider
             if (rule.TargetType == IntroTargetType.EpisodesOnly && item.GetBaseItemKind() != Data.Enums.BaseItemKind.Episode)
                 continue;
 
+            // Current date filters
             if (!rule.IsDateInRange(now))
+                continue;
+
+            // Media release date filters (handles single-ended ranges cleanly)
+            if (rule.ReleaseDateStart != null && premiereDate < rule.ReleaseDateStart.Value)
+                continue;
+
+            if (rule.ReleaseDateEnd != null && premiereDate > rule.ReleaseDateEnd.Value)
                 continue;
 
             // 2. Roll frequency
             if (rule.Frequency < 100 && _random.Next(1, 101) > rule.Frequency)
                 continue; // Roll failed, continue to next rule
 
-            // 3. Match found! Choose a video from this rule's list
+            // 3. Match found! Choose video(s) from this rule's list
             if (rule.IntroIds.Any())
             {
-                var selectedId = rule.IntroIds[_random.Next(rule.IntroIds.Count)];
-                if (libraryResults.ContainsKey(selectedId))
+                if (rule.PlayAllIntros)
                 {
-                    var selectedItem = libraryResults[selectedId];
-                    logger.LogInformation($"Rule matched: '{rule.Name}'. Selected intro name: '{selectedItem.Name}'");
-                    return new[] { new IntroInfo { Path = selectedItem.Path, ItemId = selectedItem.Id } };
+                    // Play all configured intros in sequence
+                    var list = new List<IntroInfo>();
+                    foreach (var id in rule.IntroIds)
+                    {
+                        if (libraryResults.ContainsKey(id))
+                        {
+                            var itemInfo = libraryResults[id];
+                            list.Add(new IntroInfo { Path = itemInfo.Path, ItemId = itemInfo.Id });
+                        }
+                    }
+                    if (list.Any())
+                    {
+                        logger.LogInformation($"Rule matched: '{rule.Name}'. Selected {list.Count} intros (Play All Mode).");
+                        return list;
+                    }
+                }
+                else
+                {
+                    // Choose one random video (legacy behavior)
+                    var selectedId = rule.IntroIds[_random.Next(rule.IntroIds.Count)];
+                    if (libraryResults.ContainsKey(selectedId))
+                    {
+                        var selectedItem = libraryResults[selectedId];
+                        logger.LogInformation($"Rule matched: '{rule.Name}'. Selected intro name: '{selectedItem.Name}' (Random Mode).");
+                        return new[] { new IntroInfo { Path = selectedItem.Path, ItemId = selectedItem.Id } };
+                    }
                 }
             }
         }

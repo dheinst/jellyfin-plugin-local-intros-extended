@@ -41,19 +41,25 @@ public class IntroRule
     public string Name { get; set; } = string.Empty;
     public List<Guid> IntroIds { get; set; } = new List<Guid>();
     public int Frequency { get; set; } = 100; // 0-100%
+    public bool PlayAllIntros { get; set; } = false; // false = play one random, true = play all sequentially
 
     // Conditions
     public List<string> Genres { get; set; } = new List<string>();
     public List<string> Tags { get; set; } = new List<string>();
+    public List<string> ExcludeTags { get; set; } = new List<string>();
     public List<string> Studios { get; set; } = new List<string>();
     public List<Guid> UserIds { get; set; } = new List<Guid>();
     public List<Guid> LibraryIds { get; set; } = new List<Guid>();
     public IntroTargetType TargetType { get; set; } = IntroTargetType.All;
 
-    // Date conditions
+    // Date conditions (Current Date)
     public DateTime? DateStart { get; set; }
     public DateTime? DateEnd { get; set; }
     public CurrentDateRepeatRangeType DateRepeatType { get; set; } = CurrentDateRepeatRangeType.None;
+
+    // Media Release Date conditions (fixed date range checks)
+    public DateTime? ReleaseDateStart { get; set; }
+    public DateTime? ReleaseDateEnd { get; set; }
 
     public bool IsDateInRange(DateTime relevantDate)
     {

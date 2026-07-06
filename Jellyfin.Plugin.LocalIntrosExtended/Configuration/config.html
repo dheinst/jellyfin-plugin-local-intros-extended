@@ -36,10 +36,19 @@
                             <input id="ruleName" is="emby-input" type="text" placeholder="e.g., Action Movies" />
                         </div>
 
-                        <!-- Row 2: Intros -->
-                        <div class="inputContainer" style="margin-bottom: 1.5em;">
-                            <label class="inputLabel inputLabelUnfocused" for="videoSelection">Intros <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Hold Ctrl/Cmd to select multiple. One will be chosen randomly)</span></label>
-                            <select id="videoSelection" multiple style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
+                        <!-- Row 2: Intros & Playback Mode -->
+                        <div style="display: flex; gap: 1.5em; margin-bottom: 1.5em; flex-wrap: wrap;">
+                            <div class="inputContainer" style="flex: 2; min-width: 250px; margin: 0;">
+                                <label class="inputLabel inputLabelUnfocused" for="videoSelection">Intros <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Hold Ctrl/Cmd to select multiple)</span></label>
+                                <select id="videoSelection" multiple style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
+                            </div>
+                            <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
+                                <label class="inputLabel inputLabelUnfocused" for="playModeSelection">Playback Mode <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Choose selection behavior)</span></label>
+                                <select id="playModeSelection" is="emby-select">
+                                    <option value="false">Play one random video (default)</option>
+                                    <option value="true">Play all selected videos in sequence</option>
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Row 3: Freq & Target -->
@@ -74,20 +83,24 @@
                             </div>
                         </div>
 
-                        <!-- Row 5: Tags & Studios -->
+                        <!-- Row 5: Includes Tags, Excludes Tags, Studios -->
                         <div style="display: flex; gap: 1.5em; margin-bottom: 1.5em; flex-wrap: wrap;">
-                            <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="tagSelection">Tags <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - comma-separated)</span></label>
+                            <div class="inputContainer" style="flex: 1; min-width: 180px; margin: 0;">
+                                <label class="inputLabel inputLabelUnfocused" for="tagSelection">Includes Tags <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - comma-separated)</span></label>
                                 <input id="tagSelection" is="emby-input" type="text" placeholder="e.g., IMAX, 3D" />
                             </div>
-                            <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
+                            <div class="inputContainer" style="flex: 1; min-width: 180px; margin: 0;">
+                                <label class="inputLabel inputLabelUnfocused" for="excludeTagSelection">Excludes Tags <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - e.g., nointro)</span></label>
+                                <input id="excludeTagSelection" is="emby-input" type="text" placeholder="e.g., nointro, documentary" />
+                            </div>
+                            <div class="inputContainer" style="flex: 1; min-width: 180px; margin: 0;">
                                 <label class="inputLabel inputLabelUnfocused" for="studioSelection">Studios <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - comma-separated)</span></label>
                                 <input id="studioSelection" is="emby-input" type="text" placeholder="e.g., Marvel, Disney" />
                             </div>
                         </div>
 
-                        <!-- Row 6: Dates & Repeat -->
-                        <div style="display: flex; gap: 1.5em; margin-bottom: 2em; flex-wrap: wrap;">
+                        <!-- Row 6: Current Date & Repeat -->
+                        <div style="display: flex; gap: 1.5em; margin-bottom: 1.5em; flex-wrap: wrap;">
                             <div class="inputContainer" style="flex: 1; min-width: 150px; margin: 0;">
                                 <label class="inputLabel inputLabelUnfocused" for="dateStart">Start Date</label>
                                 <input id="dateStart" is="emby-input" type="date" />
@@ -104,6 +117,18 @@
                                     <option value="Monthly">Monthly</option>
                                     <option value="Yearly">Yearly</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 7: Media Release Date Range -->
+                        <div style="display: flex; gap: 1.5em; margin-bottom: 2em; flex-wrap: wrap;">
+                            <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
+                                <label class="inputLabel inputLabelUnfocused" for="releaseDateStart">Media Release Start Date <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Filter by media release year)</span></label>
+                                <input id="releaseDateStart" is="emby-input" type="date" />
+                            </div>
+                            <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
+                                <label class="inputLabel inputLabelUnfocused" for="releaseDateEnd">Media Release End Date <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Filter by media release year)</span></label>
+                                <input id="releaseDateEnd" is="emby-input" type="date" />
                             </div>
                         </div>
 
@@ -320,16 +345,20 @@
 
                     $('#ruleName').val('');
                     $('#videoSelection').val([]);
+                    $('#playModeSelection').val("false");
                     $('#ruleFrequency').val(100);
                     $('#targetTypeSelection').val("All");
                     $('#userSelection').val([]);
                     $('#librarySelection').val([]);
                     $('#genreSelection').val([]);
                     $('#tagSelection').val('');
+                    $('#excludeTagSelection').val('');
                     $('#studioSelection').val('');
                     $('#dateStart').val('');
                     $('#dateEnd').val('');
                     $('#dateRepeatType').val("None");
+                    $('#releaseDateStart').val('');
+                    $('#releaseDateEnd').val('');
                     updateRepeatLabels();
                 };
 
@@ -343,6 +372,7 @@
 
                     $('#ruleName').val(rule.Name);
                     $('#videoSelection').val(rule.IntroIds || []);
+                    $('#playModeSelection').val((rule.PlayAllIntros ?? false).toString());
                     $('#ruleFrequency').val(rule.Frequency ?? 100);
                     
                     // Bind TargetType & DateRepeatType to their string representations
@@ -353,9 +383,12 @@
                     $('#librarySelection').val(rule.LibraryIds || []);
                     $('#genreSelection').val(rule.Genres || []);
                     $('#tagSelection').val((rule.Tags || []).join(', '));
+                    $('#excludeTagSelection').val((rule.ExcludeTags || []).join(', '));
                     $('#studioSelection').val((rule.Studios || []).join(', '));
                     $('#dateStart').val(cleanDate(rule.DateStart));
                     $('#dateEnd').val(cleanDate(rule.DateEnd));
+                    $('#releaseDateStart').val(cleanDate(rule.ReleaseDateStart));
+                    $('#releaseDateEnd').val(cleanDate(rule.ReleaseDateEnd));
                     updateRepeatLabels();
                 };
 
@@ -401,7 +434,10 @@
                             conds.push("<b>Genres:</b> " + rule.Genres.join(', '));
                         }
                         if (rule.Tags && rule.Tags.length > 0) {
-                            conds.push("<b>Tags:</b> " + rule.Tags.join(', '));
+                            conds.push("<b>Includes Tags:</b> " + rule.Tags.join(', '));
+                        }
+                        if (rule.ExcludeTags && rule.ExcludeTags.length > 0) {
+                            conds.push("<b>Exclude Tags:</b> " + rule.ExcludeTags.join(', '));
                         }
                         if (rule.Studios && rule.Studios.length > 0) {
                             conds.push("<b>Studios:</b> " + rule.Studios.join(', '));
@@ -411,7 +447,12 @@
                             if (rule.DateRepeatType === "Weekly" || rule.DateRepeatType === 1) repeatLabel = " (Weekly)";
                             if (rule.DateRepeatType === "Monthly" || rule.DateRepeatType === 2) repeatLabel = " (Monthly)";
                             if (rule.DateRepeatType === "Yearly" || rule.DateRepeatType === 3) repeatLabel = " (Yearly)";
-                            conds.push("<b>Date:</b> " + cleanDate(rule.DateStart) + " to " + cleanDate(rule.DateEnd) + repeatLabel);
+                            conds.push("<b>Active Date:</b> " + cleanDate(rule.DateStart) + " to " + cleanDate(rule.DateEnd) + repeatLabel);
+                        }
+                        if (rule.ReleaseDateStart || rule.ReleaseDateEnd) {
+                            var relStart = rule.ReleaseDateStart ? cleanDate(rule.ReleaseDateStart) : "Any";
+                            var relEnd = rule.ReleaseDateEnd ? cleanDate(rule.ReleaseDateEnd) : "Any";
+                            conds.push("<b>Released:</b> " + relStart + " to " + relEnd);
                         }
 
                         if (conds.length === 0) {
@@ -419,7 +460,12 @@
                         }
 
                         var introNames = (rule.IntroIds || []).map(getVideoName).join('<br/>');
-                        if (!introNames) introNames = "<i>No intros selected</i>";
+                        if (!introNames) {
+                            introNames = "<i>No intros selected</i>";
+                        } else {
+                            var modeLabel = rule.PlayAllIntros ? "Play All" : "Randomize";
+                            introNames = introNames + "<br/><span style='font-size:0.85em; opacity:0.65; display:inline-block; margin-top:4px;'><b>Mode:</b> " + modeLabel + "</span>";
+                        }
 
                         // Create rows
                         var row = $('<tr>').addClass('detailTableBodyRow').addClass('detailTableBodyRow-shaded');
@@ -526,16 +572,20 @@
                         }),
                         Name: ruleName,
                         IntroIds: $('#videoSelection').val() || [],
+                        PlayAllIntros: $('#playModeSelection').val() === "true",
                         Frequency: parseInt($('#ruleFrequency').val() || "100", 10),
                         TargetType: $('#targetTypeSelection').val() || "All",
                         Genres: $('#genreSelection').val() || [],
                         Tags: parseCommaList($('#tagSelection').val()),
+                        ExcludeTags: parseCommaList($('#excludeTagSelection').val()),
                         Studios: parseCommaList($('#studioSelection').val()),
                         UserIds: $('#userSelection').val() || [],
                         LibraryIds: $('#librarySelection').val() || [],
                         DateStart: $('#dateStart').val() ? $('#dateStart').val() : null,
                         DateEnd: $('#dateEnd').val() ? $('#dateEnd').val() : null,
-                        DateRepeatType: $('#dateRepeatType').val() || "None"
+                        DateRepeatType: $('#dateRepeatType').val() || "None",
+                        ReleaseDateStart: $('#releaseDateStart').val() ? $('#releaseDateStart').val() : null,
+                        ReleaseDateEnd: $('#releaseDateEnd').val() ? $('#releaseDateEnd').val() : null
                     };
 
                     if (currentEditIndex >= 0) {
