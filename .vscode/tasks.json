@@ -4,7 +4,7 @@
         {
             "label": "Build Plugin",
             "type": "shell",
-            "command": "dotnet publish Jellyfin.Plugin.LocalIntros/Jellyfin.Plugin.LocalIntros.csproj --configuration Release --output bin",
+            "command": "dotnet publish Jellyfin.Plugin.LocalIntrosExtended/Jellyfin.Plugin.LocalIntrosExtended.csproj --configuration Release --output bin",
             "problemMatcher": "$msCompile",
             "group": {
                 "kind": "build",
