@@ -1,16 +1,16 @@
-name: 'Local Intros'
-guid: '07d86795-01f2-4d22-b174-cdc6056c3e7c'
+name: 'Local Intros Extended'
+guid: '5b2c93cf-d5a2-4a7b-a25e-04f76269df91'
 version: 4
 targetAbi: '10.11.0.0'
 framework: 'net9.0'
-owner: 'Jellyfin'
-overview: 'Display flashy intros before movies and other videos'
+owner: 'dheinst'
+overview: 'Display flashy intros before movies and other videos with an advanced rule engine'
 description: >
-  Select a flashy pre-roll from local storage to run before any video content. The video details are loaded from disk after a video is played from the library from the beginning of the video. A random video is selected, and all videos in the local directory are enabled by default. Specific videos can be enabled or disabled as necessary. After videos are loaded for the first time, additional videos found in the directory are not enabled by default.
+  Select flashy pre-rolls from local storage to run before any video content. Includes a sequential rule engine with percentage frequencies, library filtering, exclude tags, and release date range limits.
 
 category: 'MoviesAndShows'
 artifacts:
-  - 'Jellyfin.Plugin.LocalIntros.dll'
+  - 'Jellyfin.Plugin.LocalIntrosExtended.dll'
 changelog: |-
   - Jellyfin 10.11 support (#51) @crobibero
   - Update README.md (#41) @lukasitaly
