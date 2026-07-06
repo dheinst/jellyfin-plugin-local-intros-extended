@@ -22,10 +22,12 @@ namespace Jellyfin.Plugin.LocalIntrosExtended;
 public class LocalIntrosExtendedController : ControllerBase
 {
     private readonly ILogger<LocalIntrosExtendedController> logger;
+    private readonly IUserManager userManager;
 
-    public LocalIntrosExtendedController(IApplicationHost appHost, ILoggerFactory loggerFactory)
+    public LocalIntrosExtendedController(IApplicationHost appHost, ILoggerFactory loggerFactory, IUserManager userManager)
     {
         this.logger = loggerFactory.CreateLogger<LocalIntrosExtendedController>();
+        this.userManager = userManager;
     }
 
     [HttpPost("LoadIntros")]
@@ -83,6 +85,8 @@ public class LocalIntrosExtendedController : ControllerBase
         var byPath = inLibrary.ToDictionary(x => x.Path, x => x);
         var isFound = inLibrary.ToDictionary(x => x.Id, x => false);
         var byId = inLibrary.ToDictionary(x => x.Id, x => x);
+
+        using var _ = logger.BeginScope(new Dictionary<string, object>());
 
         IEnumerable<string> filesOnDisk;
 
@@ -194,10 +198,14 @@ public class LocalIntrosExtendedController : ControllerBase
         }).ToList();
 
         var validIds = LocalIntrosPlugin.Instance.Configuration.DetectedLocalVideos.Select(x => x.ItemId).ToHashSet();
+        var validUserIds = userManager.Users.Select(u => u.Id).ToHashSet();
+        var validLibraryIds = LocalIntrosPlugin.LibraryManager.GetVirtualFolders().Select(f => Guid.Parse(f.ItemId)).ToHashSet();
 
         foreach (var rule in LocalIntrosPlugin.Instance.Configuration.Rules)
         {
             CleanList(rule.IntroIds, validIds);
+            CleanList(rule.UserIds, validUserIds);
+            CleanList(rule.LibraryIds, validLibraryIds);
         }
 
         LocalIntrosPlugin.Instance.SaveConfiguration();
