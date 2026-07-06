@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MediaBrowser.Model.Plugins;
 
-namespace Jellyfin.Plugin.LocalIntros.Configuration;
+namespace Jellyfin.Plugin.LocalIntrosExtended.Configuration;
 
 public class IntroPluginConfiguration : BasePluginConfiguration
 {
@@ -10,15 +10,7 @@ public class IntroPluginConfiguration : BasePluginConfiguration
 
     public List<IntroVideo> DetectedLocalVideos { get; set; } = new List<IntroVideo>();
 
-    public List<Guid> DefaultLocalVideos { get; set; } = new List<Guid>();
-
-    public List<TagIntro> TagIntros { get; set; } = new List<TagIntro>();
-    public List<GenreIntro> GenreIntros { get; set; } = new List<GenreIntro>();
-    public List<StudioIntro> StudioIntros { get; set; } = new List<StudioIntro>();
-    public List<DateRangeIntro> CurrentDateIntros { get; set; } = new List<DateRangeIntro>();
-    public List<DateRangeIntro> PremiereDateIntros { get; set; } = new List<DateRangeIntro>();
-
-    public bool IntrosForMoviesOnly { get; set; } = false;
+    public List<IntroRule> Rules { get; set; } = new List<IntroRule>();
 }
 
 public class IntroVideo
@@ -28,49 +20,13 @@ public class IntroVideo
     public Guid ItemId { get; set; }
 }
 
-public interface ISpecialIntro
+public enum IntroTargetType
 {
-    Guid IntroId { get; set; }
-    int Precedence { get; set; }
-    int Prevalence { get; set; }
+    All = 0,
+    MoviesOnly = 1,
+    EpisodesOnly = 2
 }
 
-public class TagIntro : ISpecialIntro
-{
-    public Guid IntroId { get; set; }
-    public string TagName { get; set; }
-    public int Precedence { get; set; }
-    public int Prevalence { get; set; }
-}
-public class DateRangeIntro : ISpecialIntro
-{
-    public Guid IntroId { get; set; }
-    public DateTime DateStart { get; set; }
-    public DateTime DateEnd { get; set; }
-    public int Precedence { get; set; }
-    public int Prevalence { get; set; }
-    public CurrentDateRepeatRangeType RepeatType { get; set; } = CurrentDateRepeatRangeType.None;
-    public bool IsDateInRange(DateTime relevantDate)
-    {
-        switch (RepeatType)
-        {
-            case CurrentDateRepeatRangeType.None:
-                return relevantDate >= DateStart && relevantDate <= DateEnd;
-            case CurrentDateRepeatRangeType.Weekly:
-                return relevantDate.DayOfWeek >= DateStart.DayOfWeek && relevantDate.DayOfWeek <= DateEnd.DayOfWeek;
-            case CurrentDateRepeatRangeType.Monthly:
-                return relevantDate.Day >= DateStart.Day && relevantDate.Day <= DateEnd.Day;
-            case CurrentDateRepeatRangeType.Yearly:
-                var currentYear = relevantDate.Year;
-                var pretendCurrentDate = new DateTime(currentYear, relevantDate.Month, relevantDate.Day);
-                var pretendDateEnd = new DateTime(currentYear, DateEnd.Month, DateEnd.Day);
-                var pretendDateStart = new DateTime(currentYear, DateStart.Month, DateStart.Day);
-                return pretendCurrentDate >= pretendDateStart && pretendCurrentDate <= pretendDateEnd;
-            default:
-                throw new ArgumentOutOfRangeException($"RepeatType Invalid: {RepeatType}");
-        }
-    }
-}
 public enum CurrentDateRepeatRangeType
 {
     None,
@@ -78,17 +34,59 @@ public enum CurrentDateRepeatRangeType
     Monthly,
     Yearly
 }
-public class GenreIntro : ISpecialIntro
+
+public class IntroRule
 {
-    public Guid IntroId { get; set; }
-    public string GenreName { get; set; }
-    public int Precedence { get; set; }
-    public int Prevalence { get; set; }
-}
-public class StudioIntro : ISpecialIntro
-{
-    public Guid IntroId { get; set; }
-    public string StudioName { get; set; }
-    public int Precedence { get; set; }
-    public int Prevalence { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = string.Empty;
+    public List<Guid> IntroIds { get; set; } = new List<Guid>();
+    public int Frequency { get; set; } = 100; // 0-100%
+
+    // Conditions
+    public List<string> Genres { get; set; } = new List<string>();
+    public List<string> Tags { get; set; } = new List<string>();
+    public List<string> Studios { get; set; } = new List<string>();
+    public List<Guid> UserIds { get; set; } = new List<Guid>();
+    public List<Guid> LibraryIds { get; set; } = new List<Guid>();
+    public IntroTargetType TargetType { get; set; } = IntroTargetType.All;
+
+    // Date conditions
+    public DateTime? DateStart { get; set; }
+    public DateTime? DateEnd { get; set; }
+    public CurrentDateRepeatRangeType DateRepeatType { get; set; } = CurrentDateRepeatRangeType.None;
+
+    public bool IsDateInRange(DateTime relevantDate)
+    {
+        if (DateStart == null || DateEnd == null) return true;
+        var start = DateStart.Value;
+        var end = DateEnd.Value;
+
+        switch (DateRepeatType)
+        {
+            case CurrentDateRepeatRangeType.None:
+                return relevantDate >= start && relevantDate <= end;
+            case CurrentDateRepeatRangeType.Weekly:
+                var currentDay = relevantDate.DayOfWeek;
+                if (start.DayOfWeek <= end.DayOfWeek)
+                    return currentDay >= start.DayOfWeek && currentDay <= end.DayOfWeek;
+                else // Wraparound (e.g. Friday to Monday)
+                    return currentDay >= start.DayOfWeek || currentDay <= end.DayOfWeek;
+            case CurrentDateRepeatRangeType.Monthly:
+                if (start.Day <= end.Day)
+                    return relevantDate.Day >= start.Day && relevantDate.Day <= end.Day;
+                else // Wraparound (e.g. 28th to 3rd)
+                    return relevantDate.Day >= start.Day || relevantDate.Day <= end.Day;
+            case CurrentDateRepeatRangeType.Yearly:
+                var currentYear = relevantDate.Year;
+                var pretendCurrentDate = new DateTime(currentYear, relevantDate.Month, relevantDate.Day);
+                var pretendDateEnd = new DateTime(currentYear, end.Month, end.Day);
+                var pretendDateStart = new DateTime(currentYear, start.Month, start.Day);
+                if (pretendDateStart <= pretendDateEnd)
+                    return pretendCurrentDate >= pretendDateStart && pretendCurrentDate <= pretendDateEnd;
+                else // Wraparound over year boundary
+                    return pretendCurrentDate >= pretendDateStart || pretendCurrentDate <= pretendDateEnd;
+            default:
+                return true;
+        }
+    }
 }

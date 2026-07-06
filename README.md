@@ -1,49 +1,49 @@
-<h1 align="center">Intros for Jellyfin Plugin</h1>
-<h3 align="center">Part of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
+<h1 align="center">Local Intros Extended for Jellyfin</h1>
+<h3 align="center">An enhanced fork of the official Jellyfin Intros Plugin</h3>
 
 <p align="center">
-<br/>
-<br/>
-<a href="https://github.com/jellyfin/jellyfin-plugin-intros/actions?query=workflow%3A%22Test+Build+Plugin%22">
-<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/jellyfin/jellyfin-plugin-intros/Test%20Build%20Plugin.svg">
-</a>
 <a href="https://github.com/jellyfin/jellyfin-plugin-intros">
-<img alt="MIT License" src="https://img.shields.io/github/license/jellyfin/jellyfin-plugin-intros.svg"/>
-</a>
-<a href="https://github.com/jellyfin/jellyfin-plugin-intros/releases">
-<img alt="Current Release" src="https://img.shields.io/github/release/jellyfin/jellyfin-plugin-intros.svg"/>
+<img alt="GPL-3.0 License" src="https://img.shields.io/github/license/jellyfin/jellyfin-plugin-intros.svg"/>
 </a>
 </p>
 
 ## About
 
-Plugin that enables the use of pre-roll intro videos from local storage.
+**Local Intros Extended** is a fork of the official Jellyfin Intros plugin that enables pre-roll intro videos from local storage. It replaces the simple flat rules list with a **powerful, unified Rule Engine** allowing you to combine multiple conditions for advanced playback control.
 
-## Installation
+### Key Enhancements
+*   **Sequential Evaluation (First-Match-Wins)**: Rules are evaluated from top to bottom. The first matching rule is applied. You can easily order rules using the ▲ and ▼ buttons in the UI.
+*   **Frequency percentage chance**: Set a probability (0-100%) for each rule. If the rule matches, the specified chance determines whether it plays. If the roll fails, evaluation continues to the next rule.
+*   **Logical AND combinations**: Combine filters like *User*, *Library*, *Genre*, *Tag*, *Studio*, and *Date range* inside a single rule.
+*   **Library (Collection Folder) Filter**: Restrict intros to specific libraries (e.g., play special intros only in your "Kids" or "Anime" libraries).
+*   **Rule Duplication**: Duplicate rules with a single click using the **Clone** button.
+*   **Date Wraparound Bugfixes**: Fixed the date repeating check where weekly or monthly ranges crossing boundaries (e.g. Friday to Monday, or 28th to 3rd) would not trigger.
+*   **Compact UI**: Clean grid layout for the rule builder with tooltips merged into the labels.
 
-[See the official documentation for install instructions](https://jellyfin.org/docs/general/server/plugins/index.html#installing).
+---
 
 ## Build
 
-1. To build this plugin you will need [.Net 6.x](https://dotnet.microsoft.com/download/dotnet/6.0).
+1. To build this plugin, you will need the [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) (or newer).
 
-2. Build plugin with following command
-  ```
-  dotnet publish --configuration Release --output bin
-  ```
+2. Build the plugin with the following command:
+   ```bash
+   dotnet publish Jellyfin.Plugin.LocalIntros/Jellyfin.Plugin.LocalIntros.csproj --configuration Release --output bin
+   ```
 
-3. Place the dll-file in the `plugins/intros` folder (you might need to create the folders) of your JF install
+---
 
-## Releasing
+## Installation
 
-To release the plugin we recommend [JPRM](https://github.com/oddstr13/jellyfin-plugin-repository-manager) that will build and package the plugin.
-For additional context and for how to add the packaged plugin zip to a plugin manifest see the [JPRM documentation](https://github.com/oddstr13/jellyfin-plugin-repository-manager) for more info.
+1. Copy the compiled assembly `Jellyfin.Plugin.LocalIntrosExtended.dll` from the `bin/` folder.
+2. In your Jellyfin data directory, navigate to the `plugins/` folder.
+3. Create a new directory named `LocalIntrosExtended`.
+4. Paste the `.dll` file into this directory:
+   `plugins/LocalIntrosExtended/Jellyfin.Plugin.LocalIntrosExtended.dll`
+5. Restart your Jellyfin server.
 
-## Contributing
+---
 
-We welcome all contributions and pull requests! If you have a larger feature in mind please open an issue so we can discuss the implementation before you start.
-In general refer to our [contributing guidelines](https://github.com/jellyfin/.github/blob/master/CONTRIBUTING.md) for further information.
+## License
 
-## Licence
-
-This plugins code and packages are distributed under the MIT License. See [LICENSE](./LICENSE.md) for more information.
+This plugin is distributed under the GNU GPL-3.0 License. See the [LICENSE](./LICENSE) file for more information.

@@ -2,14 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>Jellyfin.Plugin.LocalIntros</RootNamespace>
+    <RootNamespace>Jellyfin.Plugin.LocalIntrosExtended</RootNamespace>
+    <AssemblyName>Jellyfin.Plugin.LocalIntrosExtended</AssemblyName>
     <AssemblyVersion>2.2.0.100</AssemblyVersion>
     <FileVersion>2.2.0.100</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jellyfin.Controller" Version="10.*-*" />
-    <PackageReference Include="Jellyfin.Model" Version="10.*-*" />
+    <PackageReference Include="Jellyfin.Controller" Version="10.11.6" />
+    <PackageReference Include="Jellyfin.Model" Version="10.11.6" />
   </ItemGroup>
 
   <ItemGroup>
