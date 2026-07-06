@@ -151,10 +151,11 @@
                     <!-- Cleanup Tools -->
                     <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5em; margin-bottom: 2em;">
                         <h3>Maintenance Tools</h3>
-                        <div>
-                            <button id="clearVideosBtn" is="emby-button" type="button" class="raised button-submit emby-button" style="background-color: #c62828;">
-                                <span>Clean Intros (Deletes database cached metadata)</span>
+                        <div class="inputContainer" style="margin: 0;">
+                            <button id="clearVideosBtn" is="emby-button" type="button" class="raised button-submit emby-button" style="background-color: #c62828; margin: 0 0 0.5em 0;">
+                                <span>Hard Reset (Deletes Database & Rules)</span>
                             </button>
+                            <div class="fieldDescription">Only use this if you want to completely uninstall the plugin or start fresh. All database entries and configuration rules will be permanently deleted.</div>
                         </div>
                     </div>
 
