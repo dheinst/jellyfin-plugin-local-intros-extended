@@ -2,8 +2,8 @@
 <h3 align="center">An enhanced fork of the official Jellyfin Intros Plugin</h3>
 
 <p align="center">
-<a href="https://github.com/jellyfin/jellyfin-plugin-intros">
-<img alt="GPL-3.0 License" src="https://img.shields.io/github/license/jellyfin/jellyfin-plugin-intros.svg"/>
+<a href="https://github.com/dheinst/jellyfin-plugin-local-intros-extended/blob/main/LICENSE">
+<img alt="GPL-3.0 License" src="https://img.shields.io/github/license/dheinst/jellyfin-plugin-local-intros-extended.svg"/>
 </a>
 </p>
 
@@ -14,8 +14,11 @@
 ### Key Enhancements
 *   **Sequential Evaluation (First-Match-Wins)**: Rules are evaluated from top to bottom. The first matching rule is applied. You can easily order rules using the ▲ and ▼ buttons in the UI.
 *   **Frequency percentage chance**: Set a probability (0-100%) for each rule. If the rule matches, the specified chance determines whether it plays. If the roll fails, evaluation continues to the next rule.
-*   **Logical AND combinations**: Combine filters like *User*, *Library*, *Genre*, *Tag*, *Studio*, and *Date range* inside a single rule.
+*   **Playback Mode (Random vs Sequence)**: Play either one random intro from a rule's list or play all selected intros sequentially.
+*   **Logical AND combinations**: Combine filters like *User*, *Library*, *Genre*, *Tag*, *Studio*, *Current Date range*, and *Release Date range* inside a single rule.
+*   **Includes & Excludes Tags**: Renamed tags filter to "Includes Tags" and added a new "Excludes Tags" field to skip rules (e.g. for media tagged with `nointro`).
 *   **Library (Collection Folder) Filter**: Restrict intros to specific libraries (e.g., play special intros only in your "Kids" or "Anime" libraries).
+*   **Media Release Date Filter**: Check if the media premiere date falls within a configured range, allowing you to play vintage intros for retro movies.
 *   **Rule Duplication**: Duplicate rules with a single click using the **Clone** button.
 *   **Date Wraparound Bugfixes**: Fixed the date repeating check where weekly or monthly ranges crossing boundaries (e.g. Friday to Monday, or 28th to 3rd) would not trigger.
 *   **Compact UI**: Clean grid layout for the rule builder with tooltips merged into the labels.
@@ -28,7 +31,7 @@
 
 2. Build the plugin with the following command:
    ```bash
-   dotnet publish Jellyfin.Plugin.LocalIntros/Jellyfin.Plugin.LocalIntros.csproj --configuration Release --output bin
+   dotnet publish Jellyfin.Plugin.LocalIntrosExtended/Jellyfin.Plugin.LocalIntrosExtended.csproj --configuration Release --output bin
    ```
 
 ---
@@ -41,6 +44,12 @@
 4. Paste the `.dll` file into this directory:
    `plugins/LocalIntrosExtended/Jellyfin.Plugin.LocalIntrosExtended.dll`
 5. Restart your Jellyfin server.
+
+---
+
+## Credits / Attribution
+
+This project is a fork of the official [Jellyfin Intros Plugin](https://github.com/jellyfin/jellyfin-plugin-intros), which was originally created by [@dkanada](https://github.com/dkanada). Special thanks to them and all upstream contributors.
 
 ---
 
