@@ -129,6 +129,7 @@ public class LocalIntrosExtendedController : ControllerBase
                 {
                     Id = Guid.NewGuid(),
                     Path = file,
+                    OfficialRating = "G",
                     ProviderIds = new Dictionary<string, string>
                     {
                         { "prerolls.video", file }
