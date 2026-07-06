@@ -551,6 +551,14 @@
                 $('#addRuleBtn').click(() => handleAddOrUpdate());
                 $('#updateRuleBtn').click(() => handleAddOrUpdate());
 
+                $('#dateStart').on('change input', function () {
+                    var startVal = $(this).val();
+                    var endVal = $('#dateEnd').val();
+                    if (startVal && !endVal) {
+                        $('#dateEnd').val(startVal);
+                    }
+                });
+
                 $('#dateStart, #dateEnd').on('change input', updateRepeatLabels);
 
                 document.querySelector('#configForm').addEventListener('submit', function (event) {
