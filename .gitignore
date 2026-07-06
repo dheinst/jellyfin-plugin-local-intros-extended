@@ -6,4 +6,5 @@ artifacts
 # ide
 .idea
 .vs
+.vscode/
 .agents/
