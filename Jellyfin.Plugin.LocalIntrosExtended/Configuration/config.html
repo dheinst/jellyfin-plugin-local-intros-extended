@@ -1,52 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <title>Intros</title>
 </head>
+
 <body>
-    <div id="configPage" data-role="page" class="page type-interior pluginPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
+    <div id="configPage" data-role="page" class="page type-interior pluginPage"
+        data-require="emby-input,emby-button,emby-select,emby-checkbox">
         <div data-role="content">
             <div class="content-primary">
                 <form id="configForm">
-                    <p>Configure rules for playing local intro videos before media playback. Rules are evaluated sequentially from top to bottom.</p>
-                    
+                    <p>Configure rules for playing local intro videos before media playback. Rules are evaluated
+                        sequentially from top to bottom.</p>
+
                     <!-- Local Source & Refresh Row -->
                     <div style="display: flex; align-items: flex-end; gap: 1em; margin-bottom: 2em; flex-wrap: wrap;">
                         <div class="inputContainer" style="flex-grow: 1; margin: 0; min-width: 250px;">
-                            <label class="inputLabel inputLabelUnfocused" for="local">Local Source <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Location of intro videos)</span></label>
+                            <label class="inputLabel inputLabelUnfocused" for="local">Local Source <span
+                                    style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Location
+                                    of intro videos)</span></label>
                             <input id="local" is="emby-input" placeholder="/media/intros" />
                         </div>
                         <div class="inputContainer" style="margin: 0;">
-                            <button id="loadVideosBtn" is="emby-button" type="button" class="raised button-submit emby-button" style="margin: 0; height: 3.2em; min-width: 140px;">
+                            <button id="loadVideosBtn" is="emby-button" type="button"
+                                class="raised button-submit emby-button"
+                                style="margin: 0; height: 3.2em; min-width: 140px;">
                                 <span>Refresh Videos</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Rule Builder Card / Container -->
-                    <div style="border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 1.5em; margin-bottom: 2em; background: rgba(0,0,0,0.15);">
+                    <div
+                        style="border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 1.5em; margin-bottom: 2em; background: rgba(0,0,0,0.15);">
                         <h3 style="margin-top: 0; margin-bottom: 1em;">
                             <span id="editorTitle">Add New Rule</span>
                         </h3>
 
                         <!-- Row 1: Rule Name -->
                         <div class="inputContainer" style="margin-bottom: 1.5em;">
-                            <label class="inputLabel inputLabelUnfocused" for="ruleName">Rule Name <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Descriptive name for this rule)</span></label>
+                            <label class="inputLabel inputLabelUnfocused" for="ruleName">Rule Name <span
+                                    style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Descriptive
+                                    name for this rule)</span></label>
                             <input id="ruleName" is="emby-input" type="text" placeholder="e.g., Action Movies" />
                         </div>
 
                         <!-- Row 2: Intros & Playback Mode -->
                         <div style="display: flex; gap: 1.5em; margin-bottom: 1.5em; flex-wrap: wrap;">
                             <div class="inputContainer" style="flex: 2; min-width: 250px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="videoSelection">Intros <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Hold Ctrl/Cmd to select multiple)</span></label>
-                                <select id="videoSelection" multiple style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
+                                <label class="inputLabel inputLabelUnfocused" for="videoSelection">Intros <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Hold
+                                        Ctrl/Cmd to select multiple)</span></label>
+                                <select id="videoSelection" multiple
+                                    style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
                             </div>
                             <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="playModeSelection">Playback Mode <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Choose selection behavior)</span></label>
+                                <label class="inputLabel inputLabelUnfocused" for="playModeSelection">Playback Mode
+                                    <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Choose
+                                        selection behavior)</span></label>
                                 <select id="playModeSelection" is="emby-select">
-                                    <option value="false">Play one random video (default)</option>
-                                    <option value="true">Play all selected videos in sequence</option>
+                                    <option value="false">Random video</option>
+                                    <option value="true">All selected videos</option>
                                 </select>
                             </div>
                         </div>
@@ -54,11 +71,15 @@
                         <!-- Row 3: Freq & Target -->
                         <div style="display: flex; gap: 1.5em; margin-bottom: 1.5em; flex-wrap: wrap;">
                             <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="ruleFrequency">Frequency (%) <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Chance 0-100 of this rule applying)</span></label>
+                                <label class="inputLabel inputLabelUnfocused" for="ruleFrequency">Frequency (%) <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Chance
+                                        0-100 of this rule applying)</span></label>
                                 <input id="ruleFrequency" is="emby-input" type="number" value="100" min="0" max="100" />
                             </div>
                             <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="targetTypeSelection">Media Type <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Filter by media type)</span></label>
+                                <label class="inputLabel inputLabelUnfocused" for="targetTypeSelection">Media Type <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Filter
+                                        by media type)</span></label>
                                 <select id="targetTypeSelection" is="emby-select">
                                     <option value="All">Both (All)</option>
                                     <option value="MoviesOnly">Movies Only</option>
@@ -68,34 +89,53 @@
                         </div>
 
                         <!-- Row 4: Users, Libraries, Genres -->
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5em; margin-bottom: 1.5em;">
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5em; margin-bottom: 1.5em;">
                             <div class="inputContainer" style="margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="userSelection">Users <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - limit to specific users)</span></label>
-                                <select id="userSelection" multiple style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
+                                <label class="inputLabel inputLabelUnfocused" for="userSelection">Users <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional
+                                        - limit to specific users)</span></label>
+                                <select id="userSelection" multiple
+                                    style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
                             </div>
                             <div class="inputContainer" style="margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="librarySelection">Libraries <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - limit to specific libraries)</span></label>
-                                <select id="librarySelection" multiple style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
+                                <label class="inputLabel inputLabelUnfocused" for="librarySelection">Libraries <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional
+                                        - limit to specific libraries)</span></label>
+                                <select id="librarySelection" multiple
+                                    style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
                             </div>
                             <div class="inputContainer" style="margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="genreSelection">Genres <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - match media genres)</span></label>
-                                <select id="genreSelection" multiple style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
+                                <label class="inputLabel inputLabelUnfocused" for="genreSelection">Genres <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional
+                                        - match media genres)</span></label>
+                                <select id="genreSelection" multiple
+                                    style="height: 120px; width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 5px; color: inherit;"></select>
                             </div>
                         </div>
 
                         <!-- Row 5: Includes Tags, Excludes Tags, Studios -->
                         <div style="display: flex; gap: 1.5em; margin-bottom: 1.5em; flex-wrap: wrap;">
                             <div class="inputContainer" style="flex: 1; min-width: 180px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="tagSelection">Includes Tags <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - comma-separated)</span></label>
+                                <label class="inputLabel inputLabelUnfocused" for="tagSelection">Includes Tags <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional
+                                        - comma-separated)</span></label>
                                 <input id="tagSelection" is="emby-input" type="text" placeholder="e.g., IMAX, 3D" />
                             </div>
                             <div class="inputContainer" style="flex: 1; min-width: 180px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="excludeTagSelection">Excludes Tags <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - e.g., nointro)</span></label>
-                                <input id="excludeTagSelection" is="emby-input" type="text" placeholder="e.g., nointro, documentary" />
+                                <label class="inputLabel inputLabelUnfocused" for="excludeTagSelection">Excludes Tags
+                                    <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional
+                                        - e.g., nointro)</span></label>
+                                <input id="excludeTagSelection" is="emby-input" type="text"
+                                    placeholder="e.g., nointro, documentary" />
                             </div>
                             <div class="inputContainer" style="flex: 1; min-width: 180px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="studioSelection">Studios <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional - comma-separated)</span></label>
-                                <input id="studioSelection" is="emby-input" type="text" placeholder="e.g., Marvel, Disney" />
+                                <label class="inputLabel inputLabelUnfocused" for="studioSelection">Studios <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Optional
+                                        - comma-separated)</span></label>
+                                <input id="studioSelection" is="emby-input" type="text"
+                                    placeholder="e.g., Marvel, Disney" />
                             </div>
                         </div>
 
@@ -110,7 +150,9 @@
                                 <input id="dateEnd" is="emby-input" type="date" />
                             </div>
                             <div class="inputContainer" style="flex: 1; min-width: 150px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="dateRepeatType">Repeat <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Based on start/end dates)</span></label>
+                                <label class="inputLabel inputLabelUnfocused" for="dateRepeatType">Repeat <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Based
+                                        on start/end dates)</span></label>
                                 <select id="dateRepeatType" is="emby-select">
                                     <option value="None">None</option>
                                     <option value="Weekly">Weekly</option>
@@ -123,11 +165,17 @@
                         <!-- Row 7: Media Release Date Range -->
                         <div style="display: flex; gap: 1.5em; margin-bottom: 2em; flex-wrap: wrap;">
                             <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="releaseDateStart">Media Release Start Date <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Filter by media release year)</span></label>
+                                <label class="inputLabel inputLabelUnfocused" for="releaseDateStart">Media Release Start
+                                    Date <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Filter
+                                        by media release year)</span></label>
                                 <input id="releaseDateStart" is="emby-input" type="date" />
                             </div>
                             <div class="inputContainer" style="flex: 1; min-width: 200px; margin: 0;">
-                                <label class="inputLabel inputLabelUnfocused" for="releaseDateEnd">Media Release End Date <span style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Filter by media release year)</span></label>
+                                <label class="inputLabel inputLabelUnfocused" for="releaseDateEnd">Media Release End
+                                    Date <span
+                                        style="font-size: 0.85em; font-weight: normal; opacity: 0.6; margin-left: 0.5em;">(Filter
+                                        by media release year)</span></label>
                                 <input id="releaseDateEnd" is="emby-input" type="date" />
                             </div>
                         </div>
@@ -135,16 +183,19 @@
                         <!-- Form Action Buttons -->
                         <div>
                             <!-- Regular Add Mode Button -->
-                            <button id="addRuleBtn" is="emby-button" type="button" class="raised button-submit block emby-button">
+                            <button id="addRuleBtn" is="emby-button" type="button"
+                                class="raised button-submit block emby-button">
                                 <span>Add Rule</span>
                             </button>
 
                             <!-- Edit Mode Buttons Container -->
                             <div id="editButtonsContainer" style="display: none; gap: 1em;">
-                                <button id="updateRuleBtn" is="emby-button" type="button" class="raised button-submit emby-button" style="flex: 1; margin: 0;">
+                                <button id="updateRuleBtn" is="emby-button" type="button"
+                                    class="raised button-submit emby-button" style="flex: 1; margin: 0;">
                                     <span>Update Rule</span>
                                 </button>
-                                <button id="cancelEditBtn" is="emby-button" type="button" class="raised emby-button" style="flex: 1; margin: 0;">
+                                <button id="cancelEditBtn" is="emby-button" type="button" class="raised emby-button"
+                                    style="flex: 1; margin: 0;">
                                     <span>Cancel</span>
                                 </button>
                             </div>
@@ -176,16 +227,21 @@
                     <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5em; margin-bottom: 2em;">
                         <h3>Maintenance Tools</h3>
                         <div class="inputContainer" style="margin: 0;">
-                            <button id="clearVideosBtn" is="emby-button" type="button" class="raised button-submit emby-button" style="background-color: #c62828; margin: 0 0 0.5em 0;">
+                            <button id="clearVideosBtn" is="emby-button" type="button"
+                                class="raised button-submit emby-button"
+                                style="background-color: #c62828; margin: 0 0 0.5em 0;">
                                 <span>Hard Reset (Deletes Database & Rules)</span>
                             </button>
-                            <div class="fieldDescription">Only use this if you want to completely uninstall the plugin or start fresh. All database entries and configuration rules will be permanently deleted.</div>
+                            <div class="fieldDescription">Only use this if you want to completely uninstall the plugin
+                                or start fresh. All database entries and configuration rules will be permanently
+                                deleted.</div>
                         </div>
                     </div>
 
                     <!-- Save Config Button -->
                     <div>
-                        <button is="emby-button" type="submit" class="raised button-submit block emby-button" style="height: 3.5em; font-size: 1.1em;">
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button"
+                            style="height: 3.5em; font-size: 1.1em;">
                             <span>Save Configuration</span>
                         </button>
                     </div>
@@ -197,7 +253,7 @@
                 var plugin = {
                     guid: '5b2c93cf-d5a2-4a7b-a25e-04f76269df91'
                 };
-                
+
                 var cleanDate = str => str ? str.split('T')[0] : '';
 
                 var userList = [];
@@ -216,7 +272,7 @@
                     Dashboard.showLoadingMsg();
 
                     Promise.all([
-                        ApiClient.getGenres(ApiClient.getCurrentUserId()), 
+                        ApiClient.getGenres(ApiClient.getCurrentUserId()),
                         ApiClient.getStudios(ApiClient.getCurrentUserId()),
                         ApiClient.getUsers(),
                         ApiClient.getVirtualFolders(),
@@ -255,7 +311,7 @@
 
                         // Set global inputs
                         $('#local').val(localIntroConfig.Local);
-                        
+
                         // Populate videoSelection lists
                         var videoSelection = $('#videoSelection');
                         videoSelection.empty();
@@ -273,13 +329,13 @@
                 var loadVideos = () => {
                     let url = ApiClient.getUrl('LocalIntrosExtended/LoadIntros');
                     let data = {};
-                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => {loadPage()}).catch(ev => alert(ev));
+                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => { loadPage() }).catch(ev => alert(ev));
                 }
 
                 var clearIntros = () => {
                     let url = ApiClient.getUrl('LocalIntrosExtended/ClearIntros');
                     let data = {};
-                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => {loadPage()}).catch(ev => alert(ev));
+                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => { loadPage() }).catch(ev => alert(ev));
                 }
 
                 var saveChanges = () => {
@@ -310,9 +366,9 @@
                             var getOrdinal = (d) => {
                                 if (d > 3 && d < 21) return d + 'th';
                                 switch (d % 10) {
-                                    case 1:  return d + "st";
-                                    case 2:  return d + "nd";
-                                    case 3:  return d + "rd";
+                                    case 1: return d + "st";
+                                    case 2: return d + "nd";
+                                    case 3: return d + "rd";
                                     default: return d + "th";
                                 }
                             };
@@ -324,10 +380,10 @@
                             var pad = n => n.toString().padStart(2, '0');
                             var startFormatted = pad(start.getDate()) + '-' + pad(start.getMonth() + 1);
                             var endFormatted = pad(end.getDate()) + '-' + pad(end.getMonth() + 1);
-                            
+
                             var isWraparound = (start.getMonth() > end.getMonth()) || (start.getMonth() === end.getMonth() && start.getDate() > end.getDate());
                             var wrapText = isWraparound ? " next year" : "";
-                            
+
                             yearlyLabel = "Yearly (" + (startFormatted === endFormatted ? startFormatted : startFormatted + " to " + endFormatted + wrapText) + ")";
                         }
                     }
@@ -365,7 +421,7 @@
                 var populateFormForEdit = (index) => {
                     var rule = localIntroConfig.Rules[index];
                     currentEditIndex = index;
-                    
+
                     $('#editorTitle').text("Edit Rule: " + rule.Name);
                     $('#addRuleBtn').hide();
                     $('#editButtonsContainer').attr("style", "display: flex; gap: 1em;");
@@ -374,7 +430,7 @@
                     $('#videoSelection').val(rule.IntroIds || []);
                     $('#playModeSelection').val((rule.PlayAllIntros ?? false).toString());
                     $('#ruleFrequency').val(rule.Frequency ?? 100);
-                    
+
                     // Bind TargetType & DateRepeatType to their string representations
                     $('#targetTypeSelection').val(rule.TargetType || "All");
                     $('#dateRepeatType').val(rule.DateRepeatType || "None");
@@ -472,7 +528,7 @@
 
                         // Index number column
                         row.append($('<td>').addClass('detailTableBodyCell').text((idx + 1) + "."));
-                        
+
                         // Details columns
                         row.append($('<td>').addClass('detailTableBodyCell').attr("style", "font-weight: bold;").text(rule.Name));
                         row.append($('<td>').addClass('detailTableBodyCell').text(targetText));
@@ -507,7 +563,7 @@
                         dupBtn.click(() => {
                             var clone = JSON.parse(JSON.stringify(rule));
                             // Generate new ID
-                            clone.Id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                            clone.Id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                                 return v.toString(16);
                             });
@@ -532,7 +588,7 @@
 
                         actionsCell.append(upBtn).append(downBtn).append(dupBtn).append(editBtn).append(delBtn);
                         row.append(actionsCell);
-                        
+
                         tableBody.append(row);
                     });
                 };
@@ -542,7 +598,7 @@
                 $('#loadVideosBtn').click(ev => {
                     saveChanges().then(() => loadVideos());
                 });
-                
+
                 $('#clearVideosBtn').click(async ev => {
                     await saveChanges();
                     await clearIntros();
@@ -566,7 +622,7 @@
                     };
 
                     var rule = {
-                        Id: currentEditIndex >= 0 ? localIntroConfig.Rules[currentEditIndex].Id : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                        Id: currentEditIndex >= 0 ? localIntroConfig.Rules[currentEditIndex].Id : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                             return v.toString(16);
                         }),
@@ -626,4 +682,5 @@
         </script>
     </div>
 </body>
+
 </html>
