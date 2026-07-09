@@ -79,18 +79,16 @@ public class IntroProvider : IIntroProvider
 
     private Guid? GetLibraryId(BaseItem item)
     {
-        var current = item;
-        while (current != null && current.ParentId != Guid.Empty)
+        try
         {
-            var parent = LocalIntrosPlugin.LibraryManager.GetItemById(current.ParentId);
-            if (parent == null || parent.ParentId == Guid.Empty)
-            {
-                // current is the CollectionFolder (library) because its parent is the RootFolder
-                return current.Id;
-            }
-            current = parent;
+            var folders = LocalIntrosPlugin.LibraryManager.GetCollectionFolders(item);
+            return folders.FirstOrDefault()?.Id;
         }
-        return null;
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error getting collection folders for item '{ItemName}'", item.Name);
+            return null;
+        }
     }
 
     private IEnumerable<IntroInfo> Local(BaseItem item, User user)
