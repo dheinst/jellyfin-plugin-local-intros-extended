@@ -99,11 +99,25 @@ public class IntroProvider : IIntroProvider
         }
         var location = File.GetAttributes(introsPath);
 
-        var libraryResults = RetrieveIntroLibrary();
+        var libraryResults = IntroManager.RetrieveIntroLibrary();
 
         if (!libraryResults.Any())
         {
-            throw new Exception("No intros found in library");
+            logger.LogWarning("[LocalIntrosExtended] Geen intro's aangetroffen in Jellyfin-database. Automatisch herstel starten...");
+            try
+            {
+                libraryResults = IntroManager.PopulateIntroLibrary(logger, preserveGuids: true);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "[LocalIntrosExtended] Fout tijdens automatisch herstel van intro-bibliotheek.");
+            }
+
+            if (!libraryResults.Any())
+            {
+                logger.LogWarning("[LocalIntrosExtended] Geen intro-bestanden gevonden in lokaal pad.");
+                return Enumerable.Empty<IntroInfo>();
+            }
         }
 
         var (tags, genres, studios, now, premiereDate) = GetCriteriaList(item);
@@ -190,23 +204,4 @@ public class IntroProvider : IIntroProvider
 
         return Enumerable.Empty<IntroInfo>();
     }
-
-    private void UpdateOptionsConfig(IEnumerable<BaseItem> libraryResults)
-    {
-        LocalIntrosPlugin.Instance.Configuration.DetectedLocalVideos = libraryResults.Select(x => new IntroVideo
-        {
-            ItemId = x.Id,
-            Name = x.Name
-        }).OrderBy(i => i.Name).ToList();
-        LocalIntrosPlugin.Instance.SaveConfiguration();
-    }
-
-    private Dictionary<Guid, BaseItem> RetrieveIntroLibrary() =>
-        LocalIntrosPlugin.LibraryManager.GetItemsResult(new InternalItemsQuery
-        {
-            HasAnyProviderId = new Dictionary<string, string>
-            {
-                { "prerolls.video", "" }
-            }
-        }).Items.ToDictionary(x => x.Id, x => x);
 }

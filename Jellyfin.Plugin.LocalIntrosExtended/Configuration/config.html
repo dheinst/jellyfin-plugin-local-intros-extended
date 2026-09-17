@@ -15,6 +15,31 @@
                     <p>Configure rules for playing local intro videos before media playback. Rules are evaluated
                         sequentially from top to bottom.</p>
 
+                    <!-- Database Migration / Synchronization Alert Banner -->
+                    <div id="migrationAlert" style="display: none; margin: 1.5em 0 2em 0; padding: 1.4em 1.6em; background: rgba(255, 152, 0, 0.12); border: 2px solid #ff9800; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
+                        <div style="display: flex; align-items: flex-start; gap: 1.2em; flex-wrap: wrap;">
+                            <div style="background: rgba(255, 152, 0, 0.2); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-icons" style="color: #ffb74d; font-size: 28px;">warning</span>
+                            </div>
+                            <div style="flex: 1; min-width: 280px;">
+                                <h3 style="margin: 0 0 0.4em 0; color: #ffb74d; font-size: 1.2em; font-weight: 600;">
+                                    Database-synchronisatie Vereist (Jellyfin 12 Migratie Gedetecteerd)
+                                </h3>
+                                <p id="migrationAlertMsg" style="margin: 0 0 0.8em 0; line-height: 1.5; color: #eee; font-size: 0.95em;">
+                                    De Jellyfin-database bevat momenteel 0 intro-items (waarschijnlijk gewist tijdens de Jellyfin 12 upgrade). Je regels en video-koppelingen zijn veilig bewaard in de configuratie.
+                                </p>
+                                <div style="display: flex; gap: 1.8em; margin-bottom: 1.2em; flex-wrap: wrap; font-size: 0.9em; background: rgba(0,0,0,0.25); padding: 0.6em 1em; border-radius: 6px; border-left: 3px solid #ff9800;">
+                                    <div>Bestanden op schijf: <strong id="statDiskCount" style="color: #fff; font-size: 1.1em;">-</strong></div>
+                                    <div>In Jellyfin database: <strong id="statDbCount" style="color: #ff5252; font-size: 1.1em;">-</strong></div>
+                                    <div>Bewaarde regels: <strong id="statRulesCount" style="color: #4caf50; font-size: 1.1em;">-</strong></div>
+                                </div>
+                                <button id="repairDbBtn" is="emby-button" type="button" class="raised button-submit" style="background: #ff9800; color: #111; font-weight: 700; padding: 0.7em 1.6em; border-radius: 5px; cursor: pointer; text-transform: none; font-size: 1em;">
+                                    <span>Herstel & Synchroniseer Database (Zonder Dataverlies)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Local Source & Refresh Row -->
                     <div style="display: flex; align-items: flex-end; gap: 1em; margin-bottom: 2em; flex-wrap: wrap;">
                         <div class="inputContainer" style="flex-grow: 1; margin: 0; min-width: 250px;">
@@ -323,6 +348,32 @@
                         resetRuleForm();
                         updateUi();
                         Dashboard.hideLoadingMsg();
+                        checkSyncStatus();
+                    });
+                };
+
+                var checkSyncStatus = () => {
+                    let url = ApiClient.getUrl('LocalIntrosExtended/SyncStatus');
+                    return ApiClient.ajax({ type: 'GET', url }).then(status => {
+                        var needsMigration = status && (status.needsMigration ?? status.NeedsMigration);
+                        if (needsMigration) {
+                            var filesCount = status.filesOnDiskCount ?? status.FilesOnDiskCount ?? 0;
+                            var dbCount = status.databaseItemsCount ?? status.DatabaseItemsCount ?? 0;
+                            var rulesCount = status.configuredRulesCount ?? status.ConfiguredRulesCount ?? 0;
+                            var msg = status.message ?? status.Message;
+
+                            $('#statDiskCount').text(filesCount);
+                            $('#statDbCount').text(dbCount);
+                            $('#statRulesCount').text(rulesCount);
+                            if (msg) {
+                                $('#migrationAlertMsg').text(msg);
+                            }
+                            $('#migrationAlert').slideDown(300);
+                        } else {
+                            $('#migrationAlert').slideUp(200);
+                        }
+                    }).catch(err => {
+                        console.warn('[LocalIntrosExtended] Failed to check sync status', err);
                     });
                 };
 
@@ -597,6 +648,26 @@
 
                 $('#loadVideosBtn').click(ev => {
                     saveChanges().then(() => loadVideos());
+                });
+
+                $('#repairDbBtn').click(async ev => {
+                    Dashboard.showLoadingMsg();
+                    try {
+                        let url = ApiClient.getUrl('LocalIntrosExtended/RepairDatabase');
+                        let res = await ApiClient.ajax({ type: 'POST', url, data: {}, contentType: 'application/json' });
+                        Dashboard.hideLoadingMsg();
+                        Dashboard.alert({
+                            message: 'Database succesvol hersteld! Al je intro-items zijn opnieuw geregistreerd in Jellyfin met behoud van al je bestaande regels.',
+                            title: 'Herstel Voltooid'
+                        });
+                        await loadPage();
+                    } catch (err) {
+                        Dashboard.hideLoadingMsg();
+                        Dashboard.alert({
+                            message: 'Er is een fout opgetreden tijdens het herstel: ' + (err.message || (typeof err === 'object' ? JSON.stringify(err) : err)),
+                            title: 'Fout bij herstel'
+                        });
+                    }
                 });
 
                 $('#clearVideosBtn').click(async ev => {

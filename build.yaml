@@ -1,8 +1,8 @@
 name: 'Local Intros Extended'
 guid: '5b2c93cf-d5a2-4a7b-a25e-04f76269df91'
-version: 4
-targetAbi: '10.11.0.0'
-framework: 'net9.0'
+version: 5
+targetAbi: '12.0.0.0'
+framework: 'net10.0'
 owner: 'dheinst'
 overview: 'Display flashy intros before movies and other videos with an advanced rule engine'
 description: >
@@ -12,5 +12,6 @@ category: 'MoviesAndShows'
 artifacts:
   - 'Jellyfin.Plugin.LocalIntrosExtended.dll'
 changelog: |-
+  - Jellyfin 12 support (.NET 10) and safe database migration without data loss
   - Jellyfin 10.11 support (#51) @crobibero
   - Update README.md (#41) @lukasitaly

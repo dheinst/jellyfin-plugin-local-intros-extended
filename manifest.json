@@ -1,0 +1,21 @@
+[
+  {
+    "guid": "5b2c93cf-d5a2-4a7b-a25e-04f76269df91",
+    "name": "Local Intros Extended",
+    "description": "Play local intro videos and pre-rolls before media with an advanced sequential rule engine, percentage chances, and date/library filters.",
+    "overview": "Display flashy local intros and pre-rolls before media with an advanced sequential rule engine.",
+    "owner": "dheinst",
+    "category": "MoviesAndShows",
+    "imageUrl": "https://raw.githubusercontent.com/dheinst/jellyfin-plugin-local-intros-extended/main/icon.png",
+    "versions": [
+      {
+        "version": "2.3.0.0",
+        "changelog": "- Jellyfin 12 support (.NET 10)\n- Automatic and safe database migration without data loss\n- GUID-preserving intro recovery\n- Database sync status detection banner in settings",
+        "targetAbi": "12.0.0.0",
+        "sourceUrl": "https://github.com/dheinst/jellyfin-plugin-local-intros-extended/releases/download/v2.3.0.0/LocalIntrosExtended_2.3.0.0.zip",
+        "checksum": "19fb2d4133e145f66b604d7ddc4b93c4",
+        "timestamp": "2026-09-17T12:00:00Z"
+      }
+    ]
+  }
+]

@@ -18,6 +18,8 @@ public class IntroVideo
     public string Name { get; set; }
 
     public Guid ItemId { get; set; }
+
+    public string Path { get; set; } = string.Empty;
 }
 
 public enum IntroTargetType
