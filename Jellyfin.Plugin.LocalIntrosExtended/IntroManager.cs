@@ -107,9 +107,21 @@ public static class IntroManager
         var attrs = File.GetAttributes(path);
         if (attrs.HasFlag(FileAttributes.Directory))
         {
-            return Directory.EnumerateFiles(path);
+            // Only pick up video files; sidecar files (.nfo, .jpg, .DS_Store, ...) would otherwise
+            // be registered as videos and can collide on normalized name.
+            return Directory.EnumerateFiles(path).Where(IsVideoFile);
         }
         return new[] { path };
+    }
+
+    private static readonly HashSet<string> VideoExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".mp4", ".m4v", ".mkv", ".webm", ".avi", ".mov", ".wmv", ".mpg", ".mpeg", ".ts", ".m2ts", ".flv", ".ogv"
+    };
+
+    private static bool IsVideoFile(string file)
+    {
+        return !Path.GetFileName(file).StartsWith('.') && VideoExtensions.Contains(Path.GetExtension(file));
     }
 
     public static Dictionary<Guid, BaseItem> PopulateIntroLibrary(ILogger logger, bool preserveGuids = true)
@@ -127,9 +139,24 @@ public static class IntroManager
         var inLibrary = RetrieveIntroLibrary();
         logger.LogInformation("[LocalIntrosExtended] {Count} items aangetroffen in Jellyfin-database.", inLibrary.Count);
 
-        var byPath = inLibrary.Values.Where(x => !string.IsNullOrEmpty(x.Path)).ToDictionary(x => x.Path, x => x);
-        var isFound = inLibrary.ToDictionary(x => x.Key, _ => false);
-        var byId = inLibrary;
+        // Tolerate duplicate rows for the same path (left behind by earlier failed syncs); extras get cleaned up below.
+        var byPath = inLibrary.Values
+            .Where(x => !string.IsNullOrEmpty(x.Path))
+            .GroupBy(x => x.Path)
+            .ToDictionary(g => g.Key, g => g.First());
+        var filesOnDisk = GetFilesOnDisk(introsPath, logger).ToList();
+        var keepIds = filesOnDisk
+            .Where(byPath.ContainsKey)
+            .Select(f => byPath[f].Id)
+            .ToHashSet();
+
+        // Clean up database items whose files are no longer on disk BEFORE creating new ones,
+        // otherwise a reused GUID can collide with the stale row.
+        foreach (var item in inLibrary.Values.Where(x => !keepIds.Contains(x.Id)))
+        {
+            logger.LogWarning("[LocalIntrosExtended] Bestand niet langer gevonden op schijf. Item verwijderen: '{Path}'", item.Path);
+            LocalIntrosPlugin.LibraryManager.DeleteItem(item, new DeleteOptions());
+        }
 
         // Build lookups for GUID preservation
         var configByPath = config.DetectedLocalVideos
@@ -143,13 +170,12 @@ public static class IntroManager
             .ToDictionary(g => g.Key, g => g.First().ItemId, StringComparer.OrdinalIgnoreCase);
 
         var libraryResults = new Dictionary<Guid, BaseItem>();
-        var filesOnDisk = GetFilesOnDisk(introsPath, logger).ToList();
+        var usedIds = new HashSet<Guid>(keepIds);
 
         foreach (var file in filesOnDisk)
         {
             if (byPath.TryGetValue(file, out var existingItem))
             {
-                isFound[existingItem.Id] = true;
                 libraryResults[existingItem.Id] = existingItem;
             }
             else
@@ -172,10 +198,21 @@ public static class IntroManager
                     }
                 }
 
+                // Never hand out a GUID twice (two files with the same normalized name) or one
+                // that still belongs to some other item in the database.
+                if (assignedId != Guid.Empty
+                    && (usedIds.Contains(assignedId) || LocalIntrosPlugin.LibraryManager.GetItemById(assignedId) is not null))
+                {
+                    assignedId = Guid.Empty;
+                    isReused = false;
+                }
+
                 if (assignedId == Guid.Empty)
                 {
                     assignedId = Guid.NewGuid();
                 }
+
+                usedIds.Add(assignedId);
 
                 logger.LogInformation("[LocalIntrosExtended] Registreren van video '{Name}' met ID {Id} (Bestaande GUID hergebruikt: {IsReused})", normName, assignedId, isReused);
 
@@ -196,21 +233,29 @@ public static class IntroManager
             }
         }
 
-        // Clean up database items whose files are no longer on disk
-        foreach (var item in isFound.Where(f => !f.Value))
-        {
-            if (byId.TryGetValue(item.Key, out var itemToDelete))
-            {
-                logger.LogWarning("[LocalIntrosExtended] Bestand niet langer gevonden op schijf. Item verwijderen: '{Path}'", itemToDelete.Path);
-                LocalIntrosPlugin.LibraryManager.DeleteItem(itemToDelete, new DeleteOptions());
-            }
-        }
-
         // Always update configuration safely WITHOUT wiping existing rules
         UpdateOptionsConfig(libraryResults.Values, logger);
 
         logger.LogInformation("[LocalIntrosExtended] Intro-bibliotheeksynchronisatie voltooid. Totaal {Count} actieve intro's.", libraryResults.Count);
         return libraryResults;
+    }
+
+    public static int ClearIntroLibrary(ILogger logger)
+    {
+        var inLibrary = RetrieveIntroLibrary();
+        foreach (var item in inLibrary.Values)
+        {
+            logger.LogInformation("[LocalIntrosExtended] Verwijderen van {Path} uit bibliotheek.", item.Path);
+            LocalIntrosPlugin.LibraryManager.DeleteItem(item, new DeleteOptions());
+        }
+
+        // Hard reset: also drop detected videos and rules, as the UI promises.
+        var config = LocalIntrosPlugin.Instance.Configuration;
+        config.DetectedLocalVideos = new List<IntroVideo>();
+        config.Rules = new List<IntroRule>();
+        LocalIntrosPlugin.Instance.SaveConfiguration();
+
+        return inLibrary.Count;
     }
 
     private static void UpdateOptionsConfig(IEnumerable<BaseItem> libraryResults, ILogger logger)

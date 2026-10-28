@@ -74,15 +74,19 @@ public class LocalIntrosExtendedController : ControllerBase
 
     [HttpPost("ClearIntros")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult ClearIntros()
     {
-        logger.LogInformation("[LocalIntrosExtended] Wissen van alle intro-items uit Jellyfin-database.");
-        var inLibrary = IntroManager.RetrieveIntroLibrary();
-        foreach (var item in inLibrary.Values)
+        try
         {
-            logger.LogInformation("[LocalIntrosExtended] Verwijderen van {Path} uit bibliotheek.", item.Path);
-            LocalIntrosPlugin.LibraryManager.DeleteItem(item, new DeleteOptions());
+            logger.LogInformation("[LocalIntrosExtended] Wissen van alle intro-items uit Jellyfin-database.");
+            var count = IntroManager.ClearIntroLibrary(logger);
+            return Ok(new { success = true, count });
         }
-        return Ok();
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "[LocalIntrosExtended] Fout bij wissen van intro's");
+            return BadRequest(new { success = false, message = ex.Message });
+        }
     }
 }

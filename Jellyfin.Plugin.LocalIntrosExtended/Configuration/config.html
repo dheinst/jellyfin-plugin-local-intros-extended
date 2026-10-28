@@ -354,7 +354,7 @@
 
                 var checkSyncStatus = () => {
                     let url = ApiClient.getUrl('LocalIntrosExtended/SyncStatus');
-                    return ApiClient.ajax({ type: 'GET', url }).then(status => {
+                    return ApiClient.ajax({ type: 'GET', url, dataType: 'json' }).then(status => {
                         var needsMigration = status && (status.needsMigration ?? status.NeedsMigration);
                         if (needsMigration) {
                             var filesCount = status.filesOnDiskCount ?? status.FilesOnDiskCount ?? 0;
@@ -377,16 +377,35 @@
                     });
                 };
 
+                // ApiClient.ajax rejects with the fetch Response on non-2xx; pull the server's message out of it.
+                var getErrorMessage = async err => {
+                    if (err && typeof err.json === 'function') {
+                        try {
+                            var body = await err.clone().json();
+                            if (body && (body.message || body.Message)) return body.message || body.Message;
+                        } catch (e) { }
+                        try {
+                            var text = await err.text();
+                            if (text) return text;
+                        } catch (e) { }
+                        return 'HTTP ' + err.status + ' ' + (err.statusText || '');
+                    }
+                    return (err && err.message) || String(err);
+                };
+
+                var showError = async (title, err) => {
+                    Dashboard.hideLoadingMsg();
+                    Dashboard.alert({ title, message: await getErrorMessage(err) });
+                };
+
                 var loadVideos = () => {
                     let url = ApiClient.getUrl('LocalIntrosExtended/LoadIntros');
-                    let data = {};
-                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => { loadPage() }).catch(ev => alert(ev));
+                    return ApiClient.ajax({ type: 'POST', url, data: {}, contentType: 'application/json' });
                 }
 
                 var clearIntros = () => {
                     let url = ApiClient.getUrl('LocalIntrosExtended/ClearIntros');
-                    let data = {};
-                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => { loadPage() }).catch(ev => alert(ev));
+                    return ApiClient.ajax({ type: 'POST', url, data: {}, contentType: 'application/json' });
                 }
 
                 var saveChanges = () => {
@@ -646,8 +665,15 @@
 
                 document.querySelector('#configPage').addEventListener('pageshow', () => loadPage());
 
-                $('#loadVideosBtn').click(ev => {
-                    saveChanges().then(() => loadVideos());
+                $('#loadVideosBtn').click(async ev => {
+                    Dashboard.showLoadingMsg();
+                    try {
+                        await saveChanges();
+                        await loadVideos();
+                        loadPage();
+                    } catch (err) {
+                        await showError('Refresh Videos failed', err);
+                    }
                 });
 
                 $('#repairDbBtn').click(async ev => {
@@ -664,16 +690,24 @@
                     } catch (err) {
                         Dashboard.hideLoadingMsg();
                         Dashboard.alert({
-                            message: 'Er is een fout opgetreden tijdens het herstel: ' + (err.message || (typeof err === 'object' ? JSON.stringify(err) : err)),
+                            message: 'Er is een fout opgetreden tijdens het herstel: ' + await getErrorMessage(err),
                             title: 'Fout bij herstel'
                         });
                     }
                 });
 
                 $('#clearVideosBtn').click(async ev => {
-                    await saveChanges();
-                    await clearIntros();
-                    await loadVideos();
+                    if (!confirm('Hard Reset deletes all intro items from the Jellyfin database and all rules. Continue?')) return;
+                    Dashboard.showLoadingMsg();
+                    try {
+                        await saveChanges();
+                        await clearIntros();
+                        await loadVideos();
+                        loadPage();
+                    } catch (err) {
+                        await showError('Hard Reset failed', err);
+                        loadPage();
+                    }
                 });
 
                 $('#cancelEditBtn').click(() => {
